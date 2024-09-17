@@ -8,6 +8,8 @@
 | **Semester Duration**                                                 | 19<sup>th</sup> August - 25<sup>th</sup> November 2024                                                                                                                       |
 
 ## Flowchart
+![Flowchart jpeg](https://github.com/user-attachments/assets/fa9d610f-3310-4fea-a001-f84e6aed5cb7)
+
 
 ## Pseudocode
 
