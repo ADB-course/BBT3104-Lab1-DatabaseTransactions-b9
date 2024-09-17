@@ -27,47 +27,47 @@ TEST connection
 CONNECT to MySQL container using terminal
 EXECUTE `SHOW VARIABLES LIKE 'autocommit';`
 IF autocommit = ON THEN
-    EXECUTE `SET autocommit = OFF`
+    EXECUTE 'SET autocommit = OFF'
 END
 
  Step 4: Set the isolation level
-CONFIRM isolation level with `SHOW VARIABLES LIKE 'transaction_isolation';`
+CONFIRM isolation level with SHOW VARIABLES LIKE 'transaction_isolation';
 IF not SERIALIZABLE THEN
-    EXECUTE `SET TRANSACTION ISOLATION LEVEL SERIALIZABLE`
+    EXECUTE SET TRANSACTION ISOLATION LEVEL SERIALIZABLE
 END
 
  Step 5: Start the transaction
-USE `classicmodels` database
+USE classicmodels database
 START TRANSACTION
 
  Step 6: Retrieve the latest order number
 SET @orderNumber = (SELECT MAX(orderNumber) + 1 FROM orders)
 
 Step 7: Create a new order
-INSERT INTO `orders` 
+INSERT INTO orders
   VALUES (@orderNumber, CURDATE(), ADD 3 days to CURDATE(), ADD 2 days to CURDATE(), 'In Process', 145)
 
 Step 8: Create SAVEPOINT before inserting product 1
 SAVEPOINT before_product_1
 
  Step 9: Insert the first product ordered
-INSERT INTO `orderdetails` (orderNumber, productCode, quantityOrdered, priceEach, orderLineNumber)
+INSERT INTO orderdetails (orderNumber, productCode, quantityOrdered, priceEach, orderLineNumber)
   VALUES (@orderNumber, 'S18_1749', 2724, 136, 1)
 
 Step 10: Update quantity in stock for product 1
-SET @quantityInStock = (SELECT quantityInStock FROM `products` WHERE productCode = 'S18_1749')
+SET @quantityInStock = (SELECT quantityInStock FROM `products WHERE productCode = 'S18_1749')
 UPDATE `products` SET `quantityInStock` = @quantityInStock - 2724 WHERE `productCode` = 'S18_1749'
 
  Step 11: Create SAVEPOINT before inserting product 2
 SAVEPOINT before_product_2
 
  Step 12: Insert the second product ordered
-INSERT INTO `orderdetails` (orderNumber, productCode, quantityOrdered, priceEach, orderLineNumber)
+INSERT INTO `orderdetails (orderNumber, productCode, quantityOrdered, priceEach, orderLineNumber)
   VALUES (@orderNumber, 'S18_2248', 540, 55.09, 2)
 
  Step 13: Update quantity in stock for product 2
 SET @quantityInStock = (SELECT quantityInStock FROM `products` WHERE productCode = 'S18_2248')
-UPDATE `products` SET `quantityInStock` = @quantityInStock - 540 WHERE `productCode` = 'S18_2248'
+UPDATE `products SET `quantityInStock = @quantityInStock - 540 WHERE `productCode = 'S18_2248'
 
  Step 14: Rollback to savepoint before product 2
 ROLLBACK TO SAVEPOINT before_product_2
@@ -76,22 +76,22 @@ ROLLBACK TO SAVEPOINT before_product_2
 SAVEPOINT before_product_3
 
  Step 16: Insert the third product ordered
-INSERT INTO `orderdetails` (orderNumber, productCode, quantityOrdered, priceEach, orderLineNumber)
+INSERT INTO `orderdetails (orderNumber, productCode, quantityOrdered, priceEach, orderLineNumber)
   VALUES (@orderNumber, 'S12_1099', 68, 95.34, 3)
 
  Step 17: Update quantity in stock for product 3
 SET @quantityInStock = (SELECT quantityInStock FROM `products` WHERE productCode = 'S12_1099')
-UPDATE `products` SET `quantityInStock` = @quantityInStock - 68 WHERE `productCode` = 'S12_1099'
+UPDATE `products SET quantityInStock = @quantityInStock - 68 WHERE productCode = 'S12_1099'
 
  Step 18: Receive payment for the order
-INSERT INTO `payments` (customerNumber, checkNumber, paymentDate, amount)
+INSERT INTO `payments (customerNumber, checkNumber, paymentDate, amount)
   VALUES (145, 'JM555210', CURDATE(), 300000)
 
 Step 19: Commit the transaction
 COMMIT TRANSACTION
 
 Step 20: Verify the transaction results
-SELECT * FROM `classicmodels`.`orderdetails` WHERE orderNumber = @orderNumber
+SELECT * FROM `classicmodels.orderdetailsWHERE orderNumber = @orderNumber
 
 
 ## Support for the Sales Departments' Report
